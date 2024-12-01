@@ -1,13 +1,13 @@
 build: bin/ bin/addr.o bin/main.o #bin/server.o bin/client.o
-	gcc -Werror -Wall bin/addr.o bin/main.o bin/server.o bin/client.o -o ncc
+	gcc -Werror -Wall bin/addr.o bin/main.o bin/server.o bin/client.o -o bin/ncc
 
 test: bin/ bin/test.o bin/addr.o #bin/server.o bin/client.o
-	gcc -Werror -Wall bin/addr.o bin/test.o -o ncc_test #bin/server.o bin/client.o 
+	gcc -Werror -Wall bin/addr.o bin/test.o -o bin/ncc_test #bin/server.o bin/client.o 
 
 clean:
 	rm -f bin/*
 	rm -rf bin/
-	
+
 bin/addr.o: src/addr.c
 	gcc -Werror -Wall src/addr.c -c -o bin/addr.o
 
