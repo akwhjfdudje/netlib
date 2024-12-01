@@ -1,9 +1,10 @@
 #include "addr.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/socket.h>
 
 // Function to get useable form of given ip:
-// v: stores the ip version to use: 0 for ipv4, 1 for ipv6, -1 for unspecified
+// v: stores the ip version to use: 0 for ipv4, 1 for ipv6
 // address: stores a pointer to char that stores the ip address
 // sockaddr: stores the output from inet_pton
 int getIPToInteger(int v, const char* address, struct in_addr* sockaddr) {
@@ -11,21 +12,17 @@ int getIPToInteger(int v, const char* address, struct in_addr* sockaddr) {
     // Declaring variables:
     // status: to store result of inet_pton
     // ip_f: stores the address family to use
-    int status, int ip_f;
+    int status, ip_f;
 
     // Getting value for ip_f:
     if ( v == 0 ) {
         ip_f = AF_INET;
-    } 
-    
-    if ( v == 1 ) {
+    } else if ( v == 1 ) {
         ip_f = AF_INET6;
-    } 
-    
-    if ( v == -1 ) {
-        ip_f = AF_UNSPEC;
+    } else {
+        printf("Invalid value for v.\n");
+        return 0;
     }
-
 
     // Checking if function was successful:
     if ( (status = inet_pton(ip_f, address, sockaddr)) == 0 ) {
@@ -34,6 +31,7 @@ int getIPToInteger(int v, const char* address, struct in_addr* sockaddr) {
     }
 
     if ( status == -1 ) {
+        printf("ip_f: %d\n", ip_f);
         printf("Invalid address family.\n");
         return 0;
     }
@@ -49,11 +47,10 @@ int getIPToInteger(int v, const char* address, struct in_addr* sockaddr) {
 int getIntegerToIP(int v, struct in_addr* sockaddr, char* ip, socklen_t len) {
 
     // Declaring variables:
-    // status: to store result of inet_pton
     // ip_f: stores the address family to use
     // ip_st: stores pointer result from inet_ntop
-    int status, int ip_f;
-    char* ip_st;
+    int ip_f;
+    const char* ip_st;
 
     // Getting value for ip_f:
     if ( v == 0 ) {
