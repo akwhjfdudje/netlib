@@ -72,3 +72,21 @@ int getIntegerToIP(int v, struct in_addr* sockaddr, char* ip, socklen_t len) {
 
     return 1;
 }
+
+// Function that gets address results from query:
+// ip: stores the ip or hostname
+// port: stores the port number in string format
+// config: stores the instructions for what kind of results to get
+// res: contains pointer to linked list of results
+int getAddresses(const char* ip, const char* port, const struct addrinfo* config, struct addrinfo **res) {
+
+    // Declaring status variable to store result of getaddrinfo
+    int status;
+
+    if ( (status = getaddrinfo(ip, port, config, res)) != 0 ) {
+        printf("Couldn't get results: %s\n", gai_strerror(status));
+        return 0;
+    }
+
+    return 1;
+}

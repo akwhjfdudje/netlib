@@ -1,8 +1,8 @@
-build: bin/ bin/addr.o bin/main.o #bin/server.o bin/client.o
+build: bin/ bin/addr.o bin/main.o bin/server.o #bin/client.o
 	gcc -Werror -Wall bin/addr.o bin/main.o bin/server.o bin/client.o -o bin/ncc
 
-test: bin/ bin/test.o bin/addr.o #bin/server.o bin/client.o
-	gcc -Werror -Wall bin/addr.o bin/test.o -o bin/ncc_test #bin/server.o bin/client.o 
+test: bin/ bin/test.o bin/addr.o bin/server.o #bin/client.o
+	gcc -Werror -Wall bin/addr.o bin/test.o -o bin/ncc_test bin/server.o #bin/client.o 
 
 clean:
 	rm -f bin/*
@@ -23,5 +23,5 @@ bin/client.o: src/client.c
 bin/test.o:
 	gcc -Werror -Wall src/main.c -DTEST -c -o bin/test.o
 
-bin/:
+bin:
 	mkdir bin/
