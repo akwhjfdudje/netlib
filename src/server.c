@@ -1,6 +1,7 @@
 #include "server.h"
 #include "addr.h"
 #include <stdio.h>
+#include <limits.h>
 
 // Function to bind to a given address and port:
 // ip, port: contains the ip and port to bind to
@@ -64,4 +65,51 @@ int listenAddress(int sockfd) {
 		printf("Couldn't listen on socket\n");
 		return 1;
 	}
+}
+
+// Function to accept a connection:
+int acceptConn(int sockfd) {
+	
+	// Declaring variables:
+	// addr: stores connection information
+	// addrlen: stores size of addr
+	// new_fd: stores the new file descriptor,
+	// for sending and recving
+	struct sockaddr_storage addr;
+	socklen_t addrlen;
+	int new_fd;
+
+	// Setting variables:
+	addrlen = sizeof(addr);
+
+	// Accept and handle errors:
+	if ( (new_fd = accept(sockfd, (struct sockaddr *)&addr, &addrlen) ) == -1 ) {
+		printf("Couldn't accept connection.\n");
+   		return 0;
+	}	   
+
+	return new_fd;
+}
+
+// Function to receive data from a connection
+int receiveData(int sockfd) {
+	
+	// Storing the number of bytes received:
+	int bytes;
+	
+	// Receiving data:
+	bytes = recv(sockfd, stdout, LINE_MAX, 0);
+
+	// Handling errors
+	if ( bytes == -1 ) {
+		printf("Couldn't receive data.\n");
+		return 0;
+	}
+
+	if ( bytes == 0 ) {
+		printf("Connection likely closed.\n");
+		return 0;	
+	}
+
+	return bytes;
 }

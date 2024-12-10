@@ -28,6 +28,8 @@ int main(int argc, char **argv) {
     // Test for getIntegerToIP in addr.h
     printf("'getIntegerToIP' test result: %d\n", getIntegerToIP(v, &(sockaddr.sin_addr), ip, INET_ADDRSTRLEN));
     printf("ip from last test: %s\n", ip);
+
+	// Test to bind and listen on an address:
     return 0;
 }
 #endif
