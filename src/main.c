@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     // address: stores address string to test conversion
     // v: stores ip version
     // sockaddr: stores sockaddr_in struct
-    char* address = "1.2.2.2";
+    char* address = "127.0.0.1";
     int v = 0;
     struct sockaddr_in sockaddr;
 
@@ -30,6 +30,8 @@ int main(int argc, char **argv) {
     printf("ip from last test: %s\n", ip);
 
 	// Test to bind and listen on an address:
+	int sockfd;
+	if ( !bindAddress(address, "9001", NULL, &sockfd) ) {
     return 0;
 }
 #endif

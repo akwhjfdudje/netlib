@@ -73,6 +73,22 @@ int getIntegerToIP(int v, struct in_addr* sockaddr, char* ip, socklen_t len) {
     return 1;
 }
 
+// Function that creates a configuration with some default values:
+int createConfig(struct addrinfo* config) {
+
+	// Check if config is null:
+	if ( config == NULL ) {
+		printf("Config is null.\n");
+		return 0;
+	}
+
+	// Setting values in the struct 
+	config->ai_family = AF_UNSPEC;
+	config->ai_socktype = SOCK_STREAM;
+
+	return 1;
+}
+
 // Function that gets address results from query:
 // ip: stores the ip or hostname
 // port: stores the port number in string format

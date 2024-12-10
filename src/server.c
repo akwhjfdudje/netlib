@@ -6,7 +6,7 @@
 // Function to bind to a given address and port:
 // ip, port: contains the ip and port to bind to
 // config: contains configuration details for address
-int bindAddress(const char* ip, const char* port, const struct addrinfo* config) {
+int bindAddress(const char* ip, const char* port, const struct addrinfo* config, int *socketf) {
 
     // Declaring variables:
     // r: stores the pointer to loop with
@@ -54,7 +54,7 @@ int bindAddress(const char* ip, const char* port, const struct addrinfo* config)
 		return 1;
 	}
 
-	return sockfd;
+	*socketf = sockfd;
 }
 
 // Function to bind to listen to a given socket
