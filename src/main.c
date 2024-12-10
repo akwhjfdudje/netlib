@@ -30,8 +30,16 @@ int main(int argc, char **argv) {
     printf("ip from last test: %s\n", ip);
 
 	// Test to bind and listen on an address:
-	int sockfd;
+	// Declaring variables:
+	// sockfd: stores the file descriptor for the binding
+	// new_fd: stores the file descriptor for sending and receiving
+	// config: stores the configuration for the binding
+	int sockfd, new_fd;
+	struct addrinfo config;
 	if ( !bindAddress(address, "9001", NULL, &sockfd) ) {
+		// TODO: add handling	
+	}
+	// TODO: finish this
     return 0;
 }
 #endif
