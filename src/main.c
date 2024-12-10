@@ -1,6 +1,8 @@
 #include "addr.h"
+#include "server.h"
 #include <stdio.h>
 #include <arpa/inet.h>
+#include <limits.h>
 
 // TODO:
 //      implement other functions
@@ -36,10 +38,42 @@ int main(int argc, char **argv) {
 	// config: stores the configuration for the binding
 	int sockfd, new_fd;
 	struct addrinfo config;
-	if ( !bindAddress(address, "9001", NULL, &sockfd) ) {
-		// TODO: add handling	
+	char buf[LINE_MAX];
+	
+	// Creating configuration:
+	if ( !createConfig(&config) ) {
+		printf("Couldn't create config.\n");
+		return 1;
 	}
-	// TODO: finish this
+
+	// Binding address:
+	if ( !bindAddress(address, "9001", NULL, &sockfd) ) {
+		printf("Couldn't bind. from main.\n");
+		return 1;
+	}
+
+	// Listening for connection:
+	printf("Listening for connections...\n");
+	if ( !listenAddress(sockfd) ) {
+		printf("Couldn't listen for connections.\n");
+		return 1;
+	}
+	
+	// Accept connection:
+	printf("Accepting a connection.\n");
+	if ( !acceptConn(sockfd, &new_fd) ) {
+		printf("Couldn't accept connection.\n");
+		return 1;
+	}
+
+	// Receiving data:
+	printf("Receiving data from connection.\n");
+	if ( !receiveData(new_fd, buf) ) {
+		printf("Couldn't receive data from connection.\n");
+		return 1;
+	} else {
+		printf("Received data: \n %s", buf);
+	}
     return 0;
 }
 #endif

@@ -2,6 +2,7 @@
 #include "addr.h"
 #include <stdio.h>
 #include <limits.h>
+#include <unistd.h>
 
 // Function to bind to a given address and port:
 // ip, port: contains the ip and port to bind to
@@ -12,12 +13,12 @@ int bindAddress(const char* ip, const char* port, const struct addrinfo* config,
     // r: stores the pointer to loop with
     // res: stores the results of querying for addresses
     struct addrinfo *r;
-    struct addrinfo **res;
-	int sockfd, new_fd, yes = 1;
+    struct addrinfo *res;
+	int sockfd, yes = 1;
 
     // Getting address results
-    if ( !(getAddresses(ip, port, config, res)) ) {
-        printf("Couldn't get address results.\n")
+    if ( !(getAddresses(ip, port, config, &res)) ) {
+        printf("Couldn't get address results.\n");
         return 0;
     }
 
@@ -51,10 +52,11 @@ int bindAddress(const char* ip, const char* port, const struct addrinfo* config,
 	// Exit if failed to bind:
 	if ( r == NULL ) {
 		printf("Couldn't bind\n");
-		return 1;
+		return 0;
 	}
 
 	*socketf = sockfd;
+	return 1;
 }
 
 // Function to bind to listen to a given socket
@@ -63,12 +65,14 @@ int listenAddress(int sockfd) {
 	// Error handling:
 	if ( listen(sockfd, 1) == -1 ) {
 		printf("Couldn't listen on socket\n");
-		return 1;
+		return 0;
 	}
+
+	return 1;
 }
 
-// Function to accept a connection:
-int acceptConn(int sockfd) {
+// Function to accept a connection, and return the new file descriptor:
+int acceptConn(int sockfd, int *new_fd) {
 	
 	// Declaring variables:
 	// addr: stores connection information
@@ -77,28 +81,30 @@ int acceptConn(int sockfd) {
 	// for sending and recving
 	struct sockaddr_storage addr;
 	socklen_t addrlen;
-	int new_fd;
+	int new_f;
 
 	// Setting variables:
 	addrlen = sizeof(addr);
 
 	// Accept and handle errors:
-	if ( (new_fd = accept(sockfd, (struct sockaddr *)&addr, &addrlen) ) == -1 ) {
+	if ( (new_f = accept(sockfd, (struct sockaddr *)&addr, &addrlen) ) == -1 ) {
 		printf("Couldn't accept connection.\n");
    		return 0;
 	}	   
 
-	return new_fd;
+	*new_fd = new_f;
+	return 1;
 }
 
 // Function to receive data from a connection
-int receiveData(int sockfd) {
+int receiveData(int sockfd, char *buf) {
 	
-	// Storing the number of bytes received:
+	// Declaring variables:
+	// bytes: stores number of bytes from recv
 	int bytes;
 	
 	// Receiving data:
-	bytes = recv(sockfd, stdout, LINE_MAX, 0);
+	bytes = recv(sockfd, buf, LINE_MAX, 0);
 
 	// Handling errors
 	if ( bytes == -1 ) {
