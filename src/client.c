@@ -13,7 +13,7 @@ int connectAddress(const char* ip, const char* port, const struct addrinfo* conf
     // res: stores the results of querying for addresses
     struct addrinfo *r;
     struct addrinfo *res;
-	int sockfd, yes = 1;
+	int sockfd;
 
     // Getting address results
     if ( !(getAddresses(ip, port, config, &res)) ) {
