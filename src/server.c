@@ -7,6 +7,7 @@
 // Function to bind to a given address and port:
 // ip, port: contains the ip and port to bind to
 // config: contains configuration details for address
+// socketf: will contain the file descriptor for the socket
 int bindAddress(const char* ip, const char* port, const struct addrinfo* config, int *socketf) {
 
     // Declaring variables:
@@ -59,7 +60,7 @@ int bindAddress(const char* ip, const char* port, const struct addrinfo* config,
 	return 1;
 }
 
-// Function to bind to listen to a given socket
+// Function to listen to a given socket
 int listenAddress(int sockfd) {
 
 	// Error handling:
@@ -96,7 +97,7 @@ int acceptConn(int sockfd, int *new_fd) {
 	return 1;
 }
 
-// Function to receive data from a connection
+// Function to receive data from a connection, and write to the given buffer
 int receiveData(int sockfd, char *buf) {
 	
 	// Declaring variables:

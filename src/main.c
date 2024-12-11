@@ -12,6 +12,7 @@
 #ifdef TEST
 int main(int argc, char **argv) {
     
+	// TODO : add client tests
     // Declaring variables for first test:
     // address: stores address string to test conversion
     // v: stores ip version
