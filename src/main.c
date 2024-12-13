@@ -1,4 +1,5 @@
 #include "addr.h"
+#include "client.h"
 #include "server.h"
 #include <stdio.h>
 #include <arpa/inet.h>
@@ -73,7 +74,24 @@ int main(int argc, char **argv) {
 		printf("Couldn't receive data from connection.\n");
 		return 1;
 	} else {
-		printf("Received data: \n %s", buf);
+		printf("Received data: \n%s", buf);
+	}
+
+
+	// Test to connect to an address:
+	
+	// Connecting to address:	
+	if ( !connectAddress(address, "8080", NULL, &sockfd) ) {
+		printf("Couldn't connect to address. from main.\n");	
+		return 1;
+	}
+
+	// Sending data to address:
+	if ( !sendData(sockfd, "Hello again!\n") ) {
+		printf("Couldn't send data to address.\n");
+		return 1;
+	} else {
+		printf("Sent data.\n");
 	}
     return 0;
 }
