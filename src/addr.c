@@ -1,6 +1,7 @@
 #include "addr.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 
 // Function to get useable form of given ip:
@@ -81,11 +82,15 @@ int createConfig(struct addrinfo* config) {
 		printf("Config is null.\n");
 		return 0;
 	}
+	
+	// Set struct to empty:
+	memset(config, 0, sizeof(struct addrinfo));
 
 	// Setting values in the struct 
 	config->ai_family = AF_UNSPEC;
+	config->ai_protocol = 0;
 	config->ai_socktype = SOCK_STREAM;
-
+	config->ai_flags = (AI_V4MAPPED | AI_ADDRCONFIG); // from "getaddrinfo" man page; default setting
 	return 1;
 }
 

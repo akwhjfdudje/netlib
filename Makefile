@@ -9,19 +9,19 @@ clean:
 	rm -rf bin/
 
 bin/addr.o: src/addr.c
-	gcc -Werror -Wall src/addr.c -c -o bin/addr.o
+	gcc -Werror -Wall -ggdb src/addr.c -c -o bin/addr.o
 
 bin/main.o: src/main.c
-	gcc -Werror -Wall src/main.c -c -o bin/main.o
+	gcc -Werror -Wall -ggdb src/main.c -c -o bin/main.o
 
 bin/server.o: src/server.c
-	gcc -Werror -Wall src/server.c -c -o bin/server.o
+	gcc -Werror -Wall -ggdb src/server.c -c -o bin/server.o
 
 bin/client.o: src/client.c
-	gcc -Werror -Wall src/client.c -c -o bin/client.o
+	gcc -Werror -Wall -ggdb src/client.c -c -o bin/client.o
 
 bin/test.o:
-	gcc -Werror -Wall src/main.c -DTEST -c -o bin/test.o
+	gcc -Werror -Wall -ggdb src/main.c -DTEST -c -o bin/test.o
 
 bin:
 	mkdir bin/
