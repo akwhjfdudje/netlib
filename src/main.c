@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Binding address:
-	if ( !bindAddress(address, "9001", NULL, &sockfd) ) {
+	if ( !bindAddress(address, "9001", &config, &sockfd) ) {
 		printf("Couldn't bind. from main.\n");
 		return 1;
 	}
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
 	// Test to connect to an address:
 	
 	// Connecting to address:	
-	if ( !connectAddress(address, "8080", NULL, &sockfd) ) {
+	if ( !connectAddress(address, "8080", &config, &sockfd) ) {
 		printf("Couldn't connect to address. from main.\n");	
 		return 1;
 	}
