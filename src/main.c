@@ -41,33 +41,14 @@ int main(int argc, char **argv) {
 	int sockfd, new_fd;
 	struct addrinfo config;
 	char buf[LINE_MAX];
-	
-	// Creating configuration:
-	if ( !createConfig(&config) ) {
-		printf("Couldn't create config.\n");
-		return 1;
-	}
 
-	// Binding address:
-	if ( !bindAddress(address, "9001", &config, &sockfd) ) {
-		printf("Couldn't bind. from main.\n");
-		return 1;
-	}
-
-	// Listening for connection:
-	printf("Listening for connections...\n");
-	if ( !listenAddress(sockfd) ) {
-		printf("Couldn't listen for connections.\n");
+	// Starting server:
+	printf("Starting server:\n");
+	if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
+		printf("Couldn't start server.\n");
 		return 1;
 	}
 	
-	// Accept connection:
-	printf("Accepting a connection.\n");
-	if ( !acceptConn(sockfd, &new_fd) ) {
-		printf("Couldn't accept connection.\n");
-		return 1;
-	}
-
 	// Receiving data:
 	printf("Receiving data from connection.\n");
 	if ( !receiveData(new_fd, buf) ) {
@@ -77,22 +58,15 @@ int main(int argc, char **argv) {
 		printf("Received data: \n%s", buf);
 	}
 
-
 	// Test to connect to an address:
-	
-	// Connecting to address:	
-	if ( !connectAddress(address, "8080", &config, &sockfd) ) {
-		printf("Couldn't connect to address. from main.\n");	
-		return 1;
-	}
 
-	// Sending data to address:
-	if ( !sendData(sockfd, "Hello again!\n") ) {
-		printf("Couldn't send data to address.\n");
+	// Connecting to server:
+	printf("Connecting to server:\n");
+	if ( !sendServer(address, "8080", &config, &sockfd, "Hello again!\n") ) {
+		printf("Couldn't connect to server.\n");
 		return 1;
-	} else {
-		printf("Sent data.\n");
 	}
+	
     return 0;
 }
 #endif

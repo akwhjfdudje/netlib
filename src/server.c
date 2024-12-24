@@ -1,5 +1,6 @@
 #include "server.h"
 #include "addr.h"
+#include <netdb.h>
 #include <stdio.h>
 #include <limits.h>
 #include <unistd.h>
@@ -119,4 +120,40 @@ int receiveData(int sockfd, char *buf) {
 	}
 
 	return bytes;
+}
+
+// Function to start a server with a given config
+// Returns the file descriptor if successful, -1 if not
+int startServer(struct addrinfo *config, char *address, char *port) {
+
+	// Declaring new variables:
+	int sockfd, new_fd;
+	
+	// Creating configuration:
+	if ( !createConfig(config) ) {
+		printf("Couldn't create config.\n");
+		return -1;
+	}
+
+	// Binding address:
+	if ( !bindAddress(address, port, config, &sockfd) ) {
+		printf("Couldn't bind. from main.\n");
+		return -1;
+	}
+
+	// Listening for connection:
+	printf("Listening for connections...\n");
+	if ( !listenAddress(sockfd) ) {
+		printf("Couldn't listen for connections.\n");
+		return -1;
+	}
+
+	// Accept connection:
+	printf("Accepting a connection.\n");
+	if ( !acceptConn(sockfd, &new_fd) ) {
+		printf("Couldn't accept connection.\n");
+		return -1;
+	}
+
+	return new_fd;
 }

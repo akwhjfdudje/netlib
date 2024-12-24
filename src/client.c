@@ -66,3 +66,24 @@ int sendData(int sockfd, char* msg) {
 
 	return 1;
 }
+
+// Function to connect to server
+// Returns 1 if successful, 0 if not
+int sendServer(char *address, char *port, struct addrinfo *config, int *sockfd, char *data) {
+
+	// Connecting to address:	
+	if ( !connectAddress(address, port, config, sockfd) ) {
+		printf("Couldn't connect to address. from connectToServer in client.c .\n");	
+		return 0;
+	}
+
+	// Sending data to address:
+	if ( !sendData(*sockfd, data) ) {
+		printf("Couldn't send data to address.\n");
+		return 0;
+	} else {
+		printf("Sent data.\n");
+	}
+
+	return 1;
+}
