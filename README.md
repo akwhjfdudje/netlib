@@ -1,3 +1,6 @@
-# nc-clone
+# netlib
 
-This is a simple clone of netcat, a Linux-based command-line utility to communicate over networks.
+This is a minimal networking library written in C, using unix sockets.
+
+Currently this project only has support for:
+- TCP
