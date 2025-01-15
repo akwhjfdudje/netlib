@@ -28,7 +28,7 @@ bin/client.o: src/client.c
 	gcc -Werror -Wall -ggdb src/client.c -c -o bin/client.o
 
 bin/test.o:
-	gcc -Werror -Wall -ggdb src/main.c -DTEST -c -o bin/test.o
+	gcc -Werror -Wall -ggdb src/test.c -c -o bin/test.o
 
 bin:
 	mkdir bin/

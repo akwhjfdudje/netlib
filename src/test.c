@@ -7,12 +7,7 @@
 #include <limits.h>
 #include <unistd.h>
 
-// TODO:
-//      implement other functions
-//      create more tests for functions
-
 // Testing code
-#ifdef TEST
 int main(int argc, char **argv) {
 
 	// Test for checking IP conversion
@@ -92,4 +87,3 @@ int main(int argc, char **argv) {
 	
     return 0;
 }
-#endif
