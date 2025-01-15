@@ -43,10 +43,9 @@ int main(int argc, char **argv) {
 	char buf[LINE_MAX];
 	char* address = "127.0.0.1"; 
 	
+	// Test to bind and listen on an address:
 	if ( argc == 2 && strcmp(argv[1], "serve") == 0 ) {
 	
-		// Test to bind and listen on an address:
-
 		// Starting server:
 		printf("Starting server:\n");
 		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
@@ -66,10 +65,10 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
+	// Test to connect to an address:
 	if ( argc == 2 && strcmp(argv[1], "connect") == 0) {
-		// Test to connect to an address:
 
-		// Create the config
+		// Create the config
 		if ( !createConfig(&config) ) {
 			printf("Couldn't create config.\n");
 			return 1;
@@ -85,5 +84,10 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 	
+	// TODO: make these tests
+	// Test to send a large amount of data
+	// Test to send a file
+	// Test to receive a large amount of data
+	// Test to receive a file
     return 0;
 }
