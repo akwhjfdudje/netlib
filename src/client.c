@@ -20,7 +20,8 @@ int connectAddress(const char* ip, const char* port, const struct addrinfo* conf
         printf("Couldn't get address results.\n");
         return 0;
     }
-
+	
+	// https://beej.us/guide/bgnet/
     // Looping through every element to get the first valid result:
     for ( r = res; r != NULL; r = r->ai_next ) {
         
@@ -56,7 +57,19 @@ int sendData(int sockfd, char* msg) {
 	int len = strlen(msg);
 
 	// Getting number of bytes sent:
-	int bytes = send(sockfd, msg, len, 0);
+	int bytes; 
+
+	// Total number of bytes:
+	int total = 0;
+
+	// https://beej.us/guide/bgnet/
+	// Sending all the bytes;
+	while ( total < len ) {
+		bytes = send(sockfd, msg+total, len, 0);
+		if ( bytes == -1 ) break;
+		total += bytes;
+		len -= bytes;
+	}
 
 	// Handling:
 	if ( bytes == -1 ) {

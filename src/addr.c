@@ -83,6 +83,7 @@ int createConfig(struct addrinfo* config) {
 		return 0;
 	}
 	
+	// https://beej.us/guide/bgnet/
 	// Set struct to empty:
 	memset(config, 0, sizeof(struct addrinfo));
 

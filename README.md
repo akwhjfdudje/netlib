@@ -9,3 +9,5 @@ WIP:
 - Concurrency
 - UDP support
 - Documentation
+
+This project is heavily inspired by Beej's Guide to Networking, and uses examples from it where noted: https://beej.us/guide/bgnet/

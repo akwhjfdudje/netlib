@@ -24,6 +24,7 @@ int bindAddress(const char* ip, const char* port, const struct addrinfo* config,
         return 0;
     }
 
+	// https://beej.us/guide/bgnet/
     // Looping through every element to get the first valid result:
     for ( r = res; r != NULL; r = r->ai_next ) {
         

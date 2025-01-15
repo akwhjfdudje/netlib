@@ -26,5 +26,5 @@ if [ "$RES" = "servertest" ]; then
 	echo "[+] Passed server test"
 else
 	echo "[-] Failed server test"
-	echo "[?] Output: $RES"
+	printf "[?] Output: \n$RES\n"
 fi

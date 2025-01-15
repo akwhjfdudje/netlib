@@ -22,9 +22,9 @@ NC_SERVER=$(cat tmp.log)
 if [ "$NC_SERVER" = "client test" ]; then
 	echo "[+] Passed client test"
 else
-	echo "[-] Failed client test:"
-	echo "[?] Server output: $NC_SERVER"
-	echo "[?] Client output: $CLIENT"
+	printf "[-] Failed client test: \n"
+	printf "[?] Server output: \n$NC_SERVER\n"
+	printf "[?] Client output: \n$CLIENT\n"
 fi
 
 # Delete the file:
