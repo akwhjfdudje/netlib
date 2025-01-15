@@ -71,12 +71,18 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	if ( argc == 2 && strcmp(argv[1], "connect") ) {
+	if ( argc == 2 && strcmp(argv[1], "connect") == 0) {
 		// Test to connect to an address:
+
+		// Create the config
+		if ( !createConfig(&config) ) {
+			printf("Couldn't create config.\n");
+			return 1;
+		}
 
 		// Connecting to server:
 		printf("Connecting to server:\n");
-		if ( !sendServer(address, "8080", &config, &sockfd, "sent to netcat\n") ) {
+		if ( !sendServer(address, "8080", &config, &sockfd, "client test\n") ) {
 			printf("Couldn't connect to server.\n");
 			return 1;
 		}

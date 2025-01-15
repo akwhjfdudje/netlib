@@ -73,7 +73,7 @@ int sendServer(char *address, char *port, struct addrinfo *config, int *sockfd, 
 
 	// Connecting to address:	
 	if ( !connectAddress(address, port, config, sockfd) ) {
-		printf("Couldn't connect to address. from connectToServer in client.c .\n");	
+		printf("Couldn't connect to address. from sendServer in client.c .\n");	
 		return 0;
 	}
 

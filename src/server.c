@@ -149,11 +149,11 @@ int startServer(struct addrinfo *config, char *address, char *port) {
 	}
 
 	// Accept connection:
-	printf("Accepting a connection.\n");
 	if ( !acceptConn(sockfd, &new_fd) ) {
 		printf("Couldn't accept connection.\n");
 		return -1;
 	}
 
+	printf("Accepting a connection.\n");
 	return new_fd;
 }
