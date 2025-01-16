@@ -51,10 +51,7 @@ int connectAddress(const char* ip, const char* port, const struct addrinfo* conf
 	return 1;
 }
 
-int sendData(int sockfd, char* msg) {
-
-	// Getting length of message:
-	int len = strlen(msg);
+int sendData(int sockfd, char* msg, long len) {
 
 	// Getting number of bytes sent:
 	int bytes; 
@@ -82,7 +79,7 @@ int sendData(int sockfd, char* msg) {
 
 // Function to connect to server
 // Returns 1 if successful, 0 if not
-int sendServer(char *address, char *port, struct addrinfo *config, int *sockfd, char *data) {
+int sendServer(char *address, char *port, struct addrinfo *config, int *sockfd, char *data, long length) {
 
 	// Connecting to address:	
 	if ( !connectAddress(address, port, config, sockfd) ) {
@@ -91,7 +88,7 @@ int sendServer(char *address, char *port, struct addrinfo *config, int *sockfd, 
 	}
 
 	// Sending data to address:
-	if ( !sendData(*sockfd, data) ) {
+	if ( !sendData(*sockfd, data, length) ) {
 		printf("Couldn't send data to address.\n");
 		return 0;
 	} else {

@@ -10,8 +10,7 @@
 
 
 // https://stackoverflow.com/questions/3747086/reading-the-whole-text-file-into-a-char-array-in-c 
-char* load_file(char const* path)
-{
+char* load_file(char const* path, long* len) {
     char* buffer = 0;
     long length;
     FILE* f = fopen (path, "rb"); 
@@ -19,6 +18,7 @@ char* load_file(char const* path)
     if (f) {
 		fseek (f, 0, SEEK_END);
 		length = ftell (f);
+		printf("length of file: %ld\n", length);
 		fseek (f, 0, SEEK_SET);
 		buffer = (char*)malloc((length+1)*sizeof(char));
 		if (buffer) {
@@ -26,7 +26,10 @@ char* load_file(char const* path)
 		}
 		fclose (f);
     }
+	printf("length of file: %ld\n", length);
     buffer[length] = '\0';
+	printf("second last char: %c\n", buffer[length - 1247]);
+	*len = length;
 	return buffer;
 }
 
@@ -34,13 +37,13 @@ char* load_file(char const* path)
 int main(int argc, char **argv) {
 
 	// Test for checking IP conversion
-	if ( argc == 2 && strcmp(argv[1], "127.0.0.1") == 0 ) {
+	if ( argc == 2 && strcmp(argv[1], "convert") == 0 ) {
 
 		// Declaring variables for first test:
 		// address: stores address string to test conversion
 		// v: stores ip version
 		// sockaddr: stores sockaddr_in struct
-		char* address = argv[1];
+		char* address = "127.0.0.1"; 
 		int v = 0;
 		struct sockaddr_in sockaddr;
 
@@ -65,6 +68,7 @@ int main(int argc, char **argv) {
 	struct addrinfo config;
 	char buf[LINE_MAX];
 	char* address = "127.0.0.1"; 
+	char* test_text = "client test\n";
 	
 	// Test to bind and listen on an address:
 	if ( argc == 2 && strcmp(argv[1], "serve") == 0 ) {
@@ -99,7 +103,7 @@ int main(int argc, char **argv) {
 
 		// Connecting to server:
 		printf("Connecting to server:\n");
-		if ( !sendServer(address, "8080", &config, &sockfd, "client test\n") ) {
+		if ( !sendServer(address, "8080", &config, &sockfd, test_text, strlen(test_text)) ) {
 			printf("Couldn't connect to server.\n");
 			return 1;
 		}
@@ -113,7 +117,8 @@ int main(int argc, char **argv) {
 	if ( argc == 2 && strcmp(argv[1], "sendfile") == 0 ) {
 
 		// Opening the file:
-		char* src = load_file("/etc/passwd");
+		long len;
+		char* src = load_file("/etc/passwd", &len);
 
 		// Create the config
 		if ( !createConfig(&config) ) {
@@ -122,7 +127,7 @@ int main(int argc, char **argv) {
 		}
 
 		// Sending the file:
-		if ( !sendServer(address, "8080", &config, &sockfd, src) ) {
+		if ( !sendServer(address, "8080", &config, &sockfd, src, len) ) {
 			printf("Couldn't send file.\n");
 			free(src);
 			return 1;

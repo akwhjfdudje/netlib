@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run the program with the given IP address:
-RES=$(bin/ncc_test 127.0.0.1) 
+RES=$(bin/ncc_test convert) 
 
 # Get results:
 if [ "$( echo $RES | awk '{ print $4 }' )" = "1" ]; then

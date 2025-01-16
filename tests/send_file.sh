@@ -11,7 +11,7 @@ killall ncc_test 1>/dev/null 2>&1
 timeout 10 nc -lp 8080 > test.file &
 
 # Wait a bit:
-sleep 0.3 
+sleep 0.1
 
 # Sending the file:
 CLIENT=$(bin/ncc_test sendfile) 
@@ -27,6 +27,7 @@ else
 	printf "$RES\n"
 	printf "[?] Client output:\n"
 	printf "$CLIENT\n"
+	exit
 fi
 
 # Deleting the file:
