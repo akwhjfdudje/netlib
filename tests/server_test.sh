@@ -12,7 +12,7 @@ killall ncc_test 1>/dev/null 2>&1
 # Start server test:
 exec 3< <(echo $(timeout 10 bin/ncc_test serve) | awk '{ print $15 $16 }')
 
-sleep 1 
+sleep 0.3 
 
 # Send message from nc client:
 echo "server test" | nc 127.0.0.1 9001 

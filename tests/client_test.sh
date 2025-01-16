@@ -9,7 +9,7 @@ killall ncc_test 1>/dev/null 2>&1
 # Start netcat server:
 timeout 10 bash -c "nc -lp 8080 > tmp.log" &
 
-sleep 1
+sleep 0.3 
 
 # Start client:
 CLIENT=$(bin/ncc_test connect)

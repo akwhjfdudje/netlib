@@ -1,11 +1,34 @@
 #include "addr.h"
 #include "client.h"
 #include "server.h"
+#include "stdlib.h"
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <limits.h>
 #include <unistd.h>
+
+
+// https://stackoverflow.com/questions/3747086/reading-the-whole-text-file-into-a-char-array-in-c 
+char* load_file(char const* path)
+{
+    char* buffer = 0;
+    long length;
+    FILE* f = fopen (path, "rb"); 
+
+    if (f) {
+		fseek (f, 0, SEEK_END);
+		length = ftell (f);
+		fseek (f, 0, SEEK_SET);
+		buffer = (char*)malloc((length+1)*sizeof(char));
+		if (buffer) {
+			fread(buffer, sizeof(char), length, f);
+		}
+		fclose (f);
+    }
+    buffer[length] = '\0';
+	return buffer;
+}
 
 // Testing code
 int main(int argc, char **argv) {
@@ -66,7 +89,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Test to connect to an address:
-	if ( argc == 2 && strcmp(argv[1], "connect") == 0) {
+	if ( argc == 2 && strcmp(argv[1], "connect") == 0 ) {
 
 		// Create the config
 		if ( !createConfig(&config) ) {
@@ -87,6 +110,28 @@ int main(int argc, char **argv) {
 	// TODO: make these tests
 	// Test to send a large amount of data
 	// Test to send a file
+	if ( argc == 2 && strcmp(argv[1], "sendfile") == 0 ) {
+
+		// Opening the file:
+		char* src = load_file("/etc/passwd");
+
+		// Create the config
+		if ( !createConfig(&config) ) {
+			printf("Couldn't create config.\n");
+			return 1;
+		}
+
+		// Sending the file:
+		if ( !sendServer(address, "8080", &config, &sockfd, src) ) {
+			printf("Couldn't send file.\n");
+			free(src);
+			return 1;
+		}
+
+		// Free the buffer at the end:
+		free(src);
+		return 0;
+	}
 	// Test to receive a large amount of data
 	// Test to receive a file
     return 0;
