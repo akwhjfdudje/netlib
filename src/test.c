@@ -6,7 +6,9 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <limits.h>
+#include <sys/types.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 
 // https://stackoverflow.com/questions/3747086/reading-the-whole-text-file-into-a-char-array-in-c 
@@ -31,6 +33,40 @@ char* load_file(char const* path, long* len) {
 	printf("second last char: %c\n", buffer[length - 1247]);
 	*len = length;
 	return buffer;
+}
+
+// Function to load random bytes into a buffer
+char* load_random(long len) {
+
+	// Declaring variables:
+	int rand;
+	ssize_t r;
+
+	// Open random stream
+	if ( (rand = open("/dev/urandom", O_RDONLY)) < 0 ) {
+		perror("open");
+		printf("Couldn't open file.\n");
+		return NULL;
+	}
+
+	// Create buffer, read bytes into the buffer
+	char* buffer = malloc(len * sizeof(char));
+	if ( (r = read(rand, buffer, len)) < 0) {
+		perror("read");
+		printf("Couldn't read the file.\n");
+		return NULL;
+	}
+
+	// Replace all null characters in the buffer:
+	for ( int i = 0; i < len; i++ ) {
+		if ( buffer[i] == '\0' ) {
+			buffer[i] = 'a';
+		}
+	}
+
+	// Return the pointer
+	return buffer;	
+	
 }
 
 // Testing code
@@ -114,6 +150,37 @@ int main(int argc, char **argv) {
 	
 	// TODO: make these tests
 	// Test to send a large amount of data
+	if ( argc == 3 && strcmp(argv[1], "sendlarge") == 0 ) {
+		
+		// Declaring variables:
+		long length = atoi(argv[2]);	
+		char* buffer = load_random(length);
+		printf("length: %ld\n", length);
+
+		// Checking buffer:
+		if ( buffer == NULL ) {
+			printf("Couldn't load bytes.\n");
+			return 1;
+		}
+
+		// Creating config:
+		if ( !createConfig(&config) ) {
+			printf("Couldn't create config.\n");
+			return 1;
+		}
+
+		// Sending data:
+		if ( !sendServer(address, "8080", &config, &sockfd, buffer, length) ) {
+			printf("Couldn't send data.\n");
+			free(buffer);	
+			return 1;
+		}
+
+		// Exiting:
+		free(buffer);
+		return 0;
+	}
+
 	// Test to send a file
 	if ( argc == 2 && strcmp(argv[1], "sendfile") == 0 ) {
 
