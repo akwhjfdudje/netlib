@@ -13,6 +13,7 @@
 
 // https://stackoverflow.com/questions/3747086/reading-the-whole-text-file-into-a-char-array-in-c 
 char* load_file(char const* path, long* len) {
+
     char* buffer = 0;
     long length;
     FILE* f = fopen (path, "rb"); 
@@ -38,20 +39,17 @@ char* load_file(char const* path, long* len) {
 // Function to load random bytes into a buffer
 char* load_random(long len) {
 
-	// Declaring variables:
-	int rand;
-	ssize_t r;
+	int openResult;
+	ssize_t readResult;
 
-	// Open random stream
-	if ( (rand = open("/dev/urandom", O_RDONLY)) < 0 ) {
+	if ( (openResult = open("/dev/urandom", O_RDONLY)) < 0 ) {
 		perror("open");
 		printf("Couldn't open file.\n");
 		return NULL;
 	}
 
-	// Create buffer, read bytes into the buffer
 	char* buffer = malloc(len * sizeof(char));
-	if ( (r = read(rand, buffer, len)) < 0) {
+	if ( (readResult = read(openResult, buffer, len)) < 0) {
 		perror("read");
 		printf("Couldn't read the file.\n");
 		return NULL;
@@ -64,9 +62,7 @@ char* load_random(long len) {
 		}
 	}
 
-	// Return the pointer
-	return buffer;	
-	
+	return buffer;		
 }
 
 // Testing code
@@ -83,14 +79,14 @@ int main(int argc, char **argv) {
 		int v = 0;
 		struct sockaddr_in sockaddr;
 
-		// Test for getIPToInteger in addr.h
+		// Test for getIPToInteger 
 		printf("'getIPToInteger' test result: %d\n", getIPToInteger(v, address, &(sockaddr.sin_addr)));
 		
 		// Declaring variables for second test:
 		// ip: will store ip from function
 		char ip[INET_ADDRSTRLEN];
 
-		// Test for getIntegerToIP in addr.h
+		// Test for getIntegerToIP
 		printf("'getIntegerToIP' test result: %d\n", getIntegerToIP(v, &(sockaddr.sin_addr), ip, INET_ADDRSTRLEN));
 		printf("ip from last test: %s\n", ip);
 		return 0;
