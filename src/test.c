@@ -68,7 +68,6 @@ int main(int argc, char **argv) {
 	struct addrinfo config;
 	char buf[LINE_MAX];
 	char* address = "127.0.0.1"; 
-	char* test_text = "client test\n";
 	
 	// Test to bind and listen on an address:
 	if ( argc == 2 && strcmp(argv[1], "serve") == 0 ) {
@@ -94,6 +93,8 @@ int main(int argc, char **argv) {
 
 	// Test to connect to an address:
 	if ( argc == 2 && strcmp(argv[1], "connect") == 0 ) {
+
+		char* test_text = "client test\n";
 
 		// Create the config
 		if ( !createConfig(&config) ) {
