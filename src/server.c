@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <limits.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 // Function to bind to a given address and port:
@@ -99,15 +100,23 @@ int acceptConn(int sockfd, int *new_fd) {
 	return 1;
 }
 
+// TODO:
+// There is currently an issue present in how data is received.
+// The current functionality expects data of the size given to be supplied
+// and will timeout on server_test, expecting more data to be provided	
+// Currently, a patch is given on the test,
+// but the main functionality will still need to be resolved later.
+
 // Function to receive data from a connection, and write to the given buffer
-int receiveData(int sockfd, char *buf) {
+int receiveData(int sockfd, char *buf, int length) {
 	
 	// Declaring variables:
 	// bytes: stores number of bytes from recv
 	int bytes;
 	
 	// Receiving data:
-	bytes = recv(sockfd, buf, LINE_MAX, 0);
+	// patch: https://stackoverflow.com/questions/70941002/read-all-data-during-single-recv-method-from-a-socket
+	bytes = recv(sockfd, buf, length, MSG_WAITALL);
 
 	// Handling errors
 	if ( bytes == -1 ) {

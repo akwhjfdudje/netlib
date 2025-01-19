@@ -20,9 +20,9 @@ NC_SERVER=$(cat tmp.log)
 # Check results:
 
 if [ "$NC_SERVER" = "client test" ]; then
-	echo "[+] Passed client test"
+	echo -e "${GREEN}[+]${NC} Passed client test"
 else
-	printf "[-] Failed client test: \n"
+	printf "${RED}[-]${NC} Failed client test: \n"
 	printf "[?] Server output: \n$NC_SERVER\n"
 	printf "[?] Client output: \n$CLIENT\n"
 fi

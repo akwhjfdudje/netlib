@@ -20,9 +20,9 @@ CLIENT=$(bin/ncc_test sendfile)
 RES=$(cat test.file)
 
 if [ "$(echo $RES | awk -F: '{ print $1 }')" = "root" ]; then
-	echo "[+] Sent file successfully"
+	echo -e "${GREEN}[+]${NC} Sent file successfully"
 else
-	echo "[-] Couldn't send file"
+	echo "${RED}[-]${NC} Couldn't send file"
 	printf "[?] Server output:\n"
 	printf "$RES\n"
 	printf "[?] Client output:\n"

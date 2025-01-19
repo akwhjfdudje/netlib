@@ -23,8 +23,8 @@ exec 3>&-
 
 # Check result:
 if [ "$RES" = "servertest" ]; then
-	echo "[+] Passed server test"
-else
-	echo "[-] Failed server test"
+	echo -e "${GREEN}[+]${NC} Passed server test" 
+else 
+	echo -e "${RED}[-]${NC} Failed server test"
 	printf "[?] Output: \n$RES\n"
 fi

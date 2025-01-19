@@ -8,6 +8,6 @@
 int bindAddress(const char* ip, const char* port, const struct addrinfo* config, int *socketf);
 int listenAddress(int sockfd);
 int acceptConn(int sockfd, int *new_fd);
-int receiveData(int sockfd, char *buf);
+int receiveData(int sockfd, char *buf, int length);
 int startServer(struct addrinfo *config, char *address, char *port);
 #endif

@@ -22,9 +22,9 @@ CLIENT=$(bin/ncc_test sendlarge $SIZE)
 RES=$(cat test.file)
 
 if [ "$(wc -c < test.file)" = "$SIZE" ]; then
-	echo "[+] Sent data successfully"
+	echo -e "${GREEN}[+]${NC} Sent data successfully"
 else
-	echo "[-] Couldn't send data"
+	echo -e "${RED}[-]${NC} Couldn't send data"
 	printf "[?] Server output:\n"
 	printf "$RES\n"
 	printf "[?] Client output:\n"

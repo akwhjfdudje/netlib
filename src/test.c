@@ -2,11 +2,13 @@
 #include "client.h"
 #include "server.h"
 #include "stdlib.h"
+#include <bits/posix2_lim.h>
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <limits.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -98,12 +100,13 @@ int main(int argc, char **argv) {
 	// config: stores the configuration for the binding
 	int sockfd, new_fd;
 	struct addrinfo config;
-	char buf[LINE_MAX];
 	char* address = "127.0.0.1"; 
 	
 	// Test to bind and listen on an address:
 	if ( argc == 2 && strcmp(argv[1], "serve") == 0 ) {
 	
+		char buf[100];
+
 		// Starting server:
 		printf("Starting server:\n");
 		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
@@ -113,7 +116,7 @@ int main(int argc, char **argv) {
 		
 		// Receiving data:
 		printf("Receiving data from connection.\n");
-		if ( !receiveData(new_fd, buf) ) {
+		if ( !receiveData(new_fd, buf, 11) ) {
 			printf("Couldn't receive data from connection.\n");
 			return 1;
 		} else {
@@ -144,7 +147,6 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 	
-	// TODO: make these tests
 	// Test to send a large amount of data
 	if ( argc == 3 && strcmp(argv[1], "sendlarge") == 0 ) {
 		
@@ -201,7 +203,63 @@ int main(int argc, char **argv) {
 		free(src);
 		return 0;
 	}
+
 	// Test to receive a large amount of data
+	if ( argc == 3 && strcmp(argv[1], "receivelarge") == 0 ) {
+
+		FILE* f = fopen("./test.file", "w+");
+		int bytes;
+		long size = atoi(argv[2]); 
+		char* randomBuffer = malloc(size * sizeof(char));
+		printf("%ld\n", size);
+		
+		// Starting server:
+		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
+			printf("Couldn't start server.\n");
+			return 1;
+		}
+		
+		// Receiving data:
+		if ( (bytes = receiveData(new_fd, randomBuffer, size)) == -1 ) {
+			printf("Couldn't receive data from connection.\n");
+			return 1;
+		} else {
+			printf("Bytes received: \n%d\n", bytes);
+			printf("Received data: \n");
+		}
+
+		// Writing to file:
+		fwrite(randomBuffer, sizeof(char), size, f);
+
+		free(randomBuffer);
+		return 0;
+	}
+
 	// Test to receive a file
+	if ( argc == 2 && strcmp(argv[1], "receive") == 0 ) {
+
+		// Checking stats of the /etc/passwd file to get the size 
+		struct stat st;
+		stat("/etc/passwd", &st);
+		int size = st.st_size;
+		char* passwdBuffer = malloc(size * sizeof(char));
+		
+		// Starting server:
+		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
+			printf("Couldn't start server.\n");
+			return 1;
+		}
+		
+		// Receiving data:
+		if ( !receiveData(new_fd, passwdBuffer, size) ) {
+			printf("Couldn't receive data from connection.\n");
+			return 1;
+		} else {
+			printf("Received data: \n%s", passwdBuffer);
+		}
+
+		free(passwdBuffer);
+		return 0;
+	}
     return 0;
 }
