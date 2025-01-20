@@ -10,4 +10,15 @@ WIP:
 - UDP support
 - Documentation
 
+To build (WIP), just run
+```
+make
+```
+
+To run tests
+```
+make clean
+make test
+```
+
 This project is heavily inspired by Beej's Guide to Networking, and uses examples from it where noted: https://beej.us/guide/bgnet/
