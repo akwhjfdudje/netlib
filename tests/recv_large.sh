@@ -28,7 +28,7 @@ SERVER=$(cat test.file | head -n5)
 if [ "$(wc -c < test.file)" = "$SIZE" ]; then
 	echo -e "${GREEN}[+]${NC} Received data successfully"
 else
-	echo "${RED}[-]${NC} Failed to receive file"
+	echo -e "${RED}[-]${NC} Failed to receive file"
 	printf "[?] Server output: \n"
 	printf "$SERVER\n"
 	printf "[?] Client output: \n"

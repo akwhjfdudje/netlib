@@ -22,7 +22,7 @@ SERVER=$(cat test.file | awk -F: '{ print $1 }' | grep root)
 if [ "$SERVER" = "root" ]; then
 	echo -e "${GREEN}[+]${NC} Received file successfully"
 else
-	echo "${RED}[-]${NC} Failed to receive file"
+	echo -e "${RED}[-]${NC} Failed to receive file"
 	printf "[?] Server output: \n"
 	printf "$SERVER\n"
 	printf "[?] Client output: \n"

@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 		
 		// Receiving data:
 		printf("Receiving data from connection.\n");
-		if ( !receiveData(new_fd, buf, 11) ) {
+		if ( !receiveData(new_fd, buf, 100) ) {
 			printf("Couldn't receive data from connection.\n");
 			return 1;
 		} else {
