@@ -102,8 +102,8 @@ int acceptConn(int sockfd, int *new_fd) {
 }
 
 // Function to receive data from a connection, and write to the given buffer
-// Note: length must be greater than or equal to the amount of data to receive,
-// otherwise may lead to not reading all data
+// Note: length must be equal to the amount of data to receive,
+// otherwise may lead to getting stuck; TODO: fix this 
 int receiveData(int sockfd, char *buf, long len) {
 	
 	// Declaring variables:
@@ -114,21 +114,15 @@ int receiveData(int sockfd, char *buf, long len) {
 
 	// https://stackoverflow.com/questions/30655002/socket-programming-recv-is-not-receiving-data-correctly	
 	// Total number of bytes:
-	//	bytes = recv(sockfd, buf, length, 0);
-	int oldcheck = 0;
 
 	// Receiving all the bytes;
 	while ( total < len ) {
 		bytes = recv(sockfd, buf+total, len, 0);
+		printf("Bytes: %d\n", bytes);
 		if ( bytes == -1 ) break;
 		if ( bytes == 0 ) break;
-
-		// hack to check if recv hasn't changed the number of bytes, i.e.
-		// if no new bytes have been received
-		if ( bytes == oldcheck ) break;
 		total += bytes;
 		len -= bytes;
-		oldcheck = bytes;
 	}
 
 	// Handling errors

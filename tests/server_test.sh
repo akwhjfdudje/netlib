@@ -9,22 +9,26 @@
 killall nc 1>/dev/null 2>&1 
 killall ncc_test 1>/dev/null 2>&1 
 
-# Start server test:
-exec 3< <(echo $(timeout 10 bin/ncc_test serve) | awk '{ print $15 $16 }')
+# Starting the server:
+timeout 10 bin/ncc_test serve > test.log &
 
+# Wait:
 sleep 0.1
 
-# Send message from nc client:
-echo "server test" | nc 127.0.0.1 9001 
+# Getting results
+CLIENT=$(echo "server test" | nc -w1 127.0.0.1 9001)
 
-# bash voodoo magic:
-read RES <& 3
-exec 3>&-
+SERVER=$(cat test.log)
 
-# Check result:
-if [ "$RES" = "servertest" ]; then
+STATUS=$(tr -d '\0' < test.file)
+
+if [ "$STATUS" = "server test" ]; then
 	echo -e "${GREEN}[+]${NC} Passed server test" 
 else 
 	echo -e "${RED}[-]${NC} Failed server test"
 	printf "[?] Output: \n$RES\n"
+	printf "[?] Server output: \n"
+	printf "$SERVER \n"
+	printf "[?] Result: \n"
+	printf "$STATUS \n"
 fi

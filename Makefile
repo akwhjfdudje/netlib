@@ -22,7 +22,7 @@ clean:
 	rm -f bin/*
 	rm -rf bin/
 	rm -rf target/
-	rm test.file test.log random.data 
+	rm -f test.file test.log random.data 
 
 # Dependencies:
 bin/addr.o: src/addr.c

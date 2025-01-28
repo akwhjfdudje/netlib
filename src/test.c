@@ -105,7 +105,9 @@ int main(int argc, char **argv) {
 	// Test to bind and listen on an address:
 	if ( argc == 2 && strcmp(argv[1], "serve") == 0 ) {
 	
-		char buf[100];
+		char buf[100] = {};
+		int bytes;
+		FILE* f = fopen("./test.file", "w+");
 
 		// Starting server:
 		printf("Starting server:\n");
@@ -116,12 +118,16 @@ int main(int argc, char **argv) {
 		
 		// Receiving data:
 		printf("Receiving data from connection.\n");
-		if ( !receiveData(new_fd, buf, 14) ) {
+		if ( (bytes = receiveData(new_fd, buf, 100)) == -1 ) {
 			printf("Couldn't receive data from connection.\n");
 			return 1;
 		} else {
+			printf("Bytes received: %d\n", bytes);
 			printf("Received data: \n%s", buf);
 		}
+
+		// Writing to file:
+		fwrite(buf, sizeof(char), 100, f);
 
 		return 0;
 	}
