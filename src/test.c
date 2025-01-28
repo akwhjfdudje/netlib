@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 		
 		// Receiving data:
 		printf("Receiving data from connection.\n");
-		if ( !receiveData(new_fd, buf, 100) ) {
+		if ( !receiveData(new_fd, buf, 14) ) {
 			printf("Couldn't receive data from connection.\n");
 			return 1;
 		} else {
@@ -208,24 +208,25 @@ int main(int argc, char **argv) {
 	if ( argc == 3 && strcmp(argv[1], "receivelarge") == 0 ) {
 
 		FILE* f = fopen("./test.file", "w+");
-		int bytes;
-		long size = atoi(argv[2]); 
+		long bytes;
+		int size = atoi(argv[2]); 
 		char* randomBuffer = malloc(size * sizeof(char));
-		printf("%ld\n", size);
+		printf("Size from args: %d\n", size);
 		
 		// Starting server:
 		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
 			printf("Couldn't start server.\n");
+			free(randomBuffer);
 			return 1;
 		}
 		
 		// Receiving data:
 		if ( (bytes = receiveData(new_fd, randomBuffer, size)) == -1 ) {
 			printf("Couldn't receive data from connection.\n");
+			free(randomBuffer);
 			return 1;
 		} else {
-			printf("Bytes received: \n%d\n", bytes);
-			printf("Received data: \n");
+			printf("Bytes received: %ld\n", bytes);
 		}
 
 		// Writing to file:
@@ -241,22 +242,30 @@ int main(int argc, char **argv) {
 		// Checking stats of the /etc/passwd file to get the size 
 		struct stat st;
 		stat("/etc/passwd", &st);
-		int size = st.st_size;
+		FILE* f = fopen("./test.file", "w+");
+		long size = st.st_size;
+		int bytes;
 		char* passwdBuffer = malloc(size * sizeof(char));
+		printf("Size of passwd: %ld\n", size);
 		
 		// Starting server:
 		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
 			printf("Couldn't start server.\n");
+			free(passwdBuffer);
 			return 1;
 		}
 		
 		// Receiving data:
-		if ( !receiveData(new_fd, passwdBuffer, size) ) {
+		if ( (bytes = receiveData(new_fd, passwdBuffer, size)) == -1 ) {
 			printf("Couldn't receive data from connection.\n");
+			free(passwdBuffer);
 			return 1;
 		} else {
-			printf("Received data: \n%s", passwdBuffer);
+			printf("Received bytes: %d\n", bytes);
 		}
+
+		// Writing to file:
+		fwrite(passwdBuffer, sizeof(char), size, f);
 
 		free(passwdBuffer);
 		return 0;

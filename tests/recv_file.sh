@@ -1,6 +1,4 @@
 #!/bin/bash
-# https://unix.stackexchange.com/questions/330086/send-random-data-over-tcp-for-a-while-and-count-how-many-bytes-were-sent
-
 # Test for receiving /etc/passwd into the current directory
 
 # Kill processes before beginning:
@@ -8,18 +6,21 @@ killall nc 1>/dev/null 2>&1
 killall ncc_test 1>/dev/null 2>&1 
 
 # Starting the server:
-timeout 10 bin/ncc_test receive > test.file &
+timeout 10 bin/ncc_test receive > test.log &
 
 # Wait:
 sleep 0.1
 
 # Getting results
-CLIENT=$(cat /etc/passwd | nc 127.0.0.1 9001)
+CLIENT=$(nc 127.0.0.1 9001 < /etc/passwd)
 
-SERVER=$(cat test.file | awk -F: '{ print $1 }' | grep root)
+SERVER=$(cat test.log)
+
+STATUS=$(cmp --silent /etc/passwd test.file; echo $?)
 
 # Checking results:
-if [ "$SERVER" = "root" ]; then
+#if [ "$SERVER" = "root" ]; then
+if [ "$STATUS" = "0" ]; then
 	echo -e "${GREEN}[+]${NC} Received file successfully"
 else
 	echo -e "${RED}[-]${NC} Failed to receive file"
@@ -31,4 +32,5 @@ else
 fi 
 
 # Delete the file:
+rm test.log
 rm test.file
