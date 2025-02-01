@@ -137,7 +137,7 @@ int receiveData(int sockfd, char *buf, long len) {
 		return 0;	
 	}
 
-	return bytes;
+	return total;
 }
 
 // Function to start a server with a given config
