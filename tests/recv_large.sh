@@ -16,6 +16,7 @@ sleep 0.1
 # Creating random data
 dd if=/dev/urandom count=1 bs=$SIZE of=./random.data 2>/dev/null 1>&2
 SIZE=$(wc -c < random.data)
+sleep 0.1
 
 # Getting results
 CLIENT=$(nc 127.0.0.1 9001 < random.data) 
