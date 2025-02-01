@@ -25,7 +25,7 @@ SERVER=$(cat test.log)
 STATUS=$(cmp --silent test.file random.data; echo $?)
 
 # Checking results:
-if [ "$STATUS" = "1" ]; then
+if [ "$STATUS" = "0" ]; then
 	echo -e "${GREEN}[+]${NC} Received data successfully"
 else
 	echo -e "${RED}[-]${NC} Failed to receive data"
