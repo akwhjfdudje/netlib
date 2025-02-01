@@ -218,6 +218,8 @@ int main(int argc, char **argv) {
 		int size = atoi(argv[2]); 
 		char* randomBuffer = malloc(size * sizeof(char));
 		printf("Size from args: %d\n", size);
+		printf("Long: %lu", sizeof(long));
+		printf("Int: %lu", sizeof(int));
 		
 		// Starting server:
 		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
