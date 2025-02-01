@@ -20,7 +20,7 @@ SIZE=$(wc -c < random.data)
 # Getting results
 CLIENT=$(nc 127.0.0.1 9001 < random.data) 
 
-SERVER=$(cat test.log | head -n5)
+SERVER=$(cat test.log)
 
 STATUS=$(cmp --silent test.file random.data; echo $?)
 
