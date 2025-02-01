@@ -117,7 +117,7 @@ int receiveData(int sockfd, char *buf, long len) {
 	// Total number of bytes:
 
 	// Receiving all the bytes;
-	while ( total < len ) {
+	while (1) {
 		bytes = recv(sockfd, buf+total, len, 0);
 		printf("Bytes: %d\n", bytes);
 		if ( bytes == -1 ) break;
