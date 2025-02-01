@@ -104,7 +104,6 @@ int acceptConn(int sockfd, int *new_fd) {
 // Function to receive data from a connection, and write to the given buffer
 // Note: length must be equal to the amount of data to receive,
 // otherwise may lead to getting stuck; TODO: fix this 
-// TODO: Bug in recv_large.sh, leading to lost bytes on some systems
 int receiveData(int sockfd, char *buf, long len) {
 	
 	// Declaring variables:
