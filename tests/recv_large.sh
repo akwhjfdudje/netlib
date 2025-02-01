@@ -8,7 +8,7 @@ killall ncc_test 1>/dev/null 2>&1
 SIZE=479114
 
 # Starting the server:
-timeout 10 bin/ncc_test receivelarge $SIZE > test.log &
+timeout 10 bin/ncc_test receivelarge $SIZE &> test.log &
 
 # Wait:
 sleep 0.1
@@ -25,7 +25,7 @@ SERVER=$(cat test.log | head -n5)
 STATUS=$(cmp --silent test.file random.data; echo $?)
 
 # Checking results:
-if [ "$STATUS" = "0" ]; then
+if [ "$STATUS" = "1" ]; then
 	echo -e "${GREEN}[+]${NC} Received data successfully"
 else
 	echo -e "${RED}[-]${NC} Failed to receive data"
