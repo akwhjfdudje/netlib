@@ -215,9 +215,9 @@ int main(int argc, char **argv) {
 
 		FILE* f = fopen("./test.file", "w+");
 		long bytes;
-		int size = atoi(argv[2]); 
+		long size = atoi(argv[2]); 
 		char* randomBuffer = malloc(size * sizeof(char));
-		printf("Size from args: %d\n", size);
+		printf("Size from args: %ld\n", size);
 		printf("Long: %lu\n", sizeof(long));
 		printf("Int: %lu\n", sizeof(int));
 		

@@ -110,16 +110,16 @@ int receiveData(int sockfd, char *buf, long len) {
 	// Declaring variables:
 	// bytes: stores number of bytes from recv
 	// total: stores the total number of bytes read
-	int bytes;
+	long bytes;
 	int total = 0;
 
 	// https://stackoverflow.com/questions/30655002/socket-programming-recv-is-not-receiving-data-correctly	
 	// Total number of bytes:
 
 	// Receiving all the bytes;
-	while ( total < len ) {
-		bytes = recv(sockfd, buf+total, len, 0);
-		printf("Bytes: %d\n", bytes);
+	while ( 1 ) {
+		bytes = recv(sockfd, buf, len, 0);
+		printf("Bytes: %ld\n", bytes);
 		if ( bytes == -1 ) break;
 		if ( bytes == 0 ) break;
 		total += bytes;
@@ -133,7 +133,6 @@ int receiveData(int sockfd, char *buf, long len) {
 
 	if ( bytes == 0 ) {
 		printf("Connection likely closed.\n");
-		return 0;	
 	}
 
 	return total;

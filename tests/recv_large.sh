@@ -18,7 +18,7 @@ dd if=/dev/urandom count=1 bs=$SIZE of=./random.data 2>/dev/null 1>&2
 SIZE=$(wc -c < random.data)
 
 # Getting results
-CLIENT=$(nc 127.0.0.1 9001 < random.data) 
+CLIENT=$(nc -w2 127.0.0.1 9001 < random.data) 
 
 SERVER=$(cat test.log)
 

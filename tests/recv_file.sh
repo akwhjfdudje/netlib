@@ -12,7 +12,7 @@ timeout 10 bin/ncc_test receive > test.log &
 sleep 0.1
 
 # Getting results
-CLIENT=$(nc 127.0.0.1 9001 < /etc/passwd)
+CLIENT=$(nc -w1 127.0.0.1 9001 < /etc/passwd)
 
 SERVER=$(cat test.log)
 
