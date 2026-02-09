@@ -4,111 +4,56 @@
 #include <string.h>
 #include <sys/socket.h>
 
-// Function to get useable form of given ip:
-// v: stores the ip version to use: 0 for ipv4, 1 for ipv6
-// address: stores a pointer to char that stores the ip address
-// sockaddr: stores the output from inet_pton
-int getIPToInteger(int v, const char* address, struct in_addr* sockaddr) {
-    
-    // Declaring variables:
-    // status: to store result of inet_pton
-    // ip_f: stores the address family to use
-    int status, ip_f;
-
-    // Getting value for ip_f:
-    if ( v == 0 ) {
-        ip_f = AF_INET;
-    } else if ( v == 1 ) {
-        ip_f = AF_INET6;
+int net_addr_to_bin(int version, const char* address, struct in_addr* out_addr) {
+    int family;
+    if (version == 0) {
+        family = AF_INET;
+    } else if (version == 1) {
+        family = AF_INET6;
     } else {
-        printf("Invalid value for v.\n");
         return 0;
     }
 
-    // Checking if function was successful:
-    if ( (status = inet_pton(ip_f, address, sockaddr)) == 0 ) {
-        printf("Invalid address string.\n");
-        return 0;
-    }
-
-    if ( status == -1 ) {
-        printf("ip_f: %d\n", ip_f);
-        printf("Invalid address family.\n");
+    int status = inet_pton(family, address, out_addr);
+    if (status <= 0) {
         return 0;
     }
 
     return 1;
 }
 
-// Function to get ip from useable form:
-// v: stores the ip version to use
-// sockaddr: in_addr struct to convert from
-// ip: stores the ip address from conversion
-// len: length of ip buffer
-int getIntegerToIP(int v, struct in_addr* sockaddr, char* ip, socklen_t len) {
-
-    // Declaring variables:
-    // ip_f: stores the address family to use
-    // ip_st: stores pointer result from inet_ntop
-    int ip_f;
-    const char* ip_st;
-
-    // Getting value for ip_f:
-    if ( v == 0 ) {
-        ip_f = AF_INET;
-    } 
-    
-    if ( v == 1 ) {
-        ip_f = AF_INET6;
-    } 
-    
-    if ( v == -1 ) {
-        ip_f = AF_UNSPEC;
+int net_bin_to_addr(int version, struct in_addr* in_addr, char* out_ip, socklen_t len) {
+    int family;
+    if (version == 0) {
+        family = AF_INET;
+    } else if (version == 1) {
+        family = AF_INET6;
+    } else {
+        return 0;
     }
 
-    if ( (ip_st = inet_ntop(ip_f, sockaddr, ip, len)) == NULL ) { 
-        printf("Can't get pointer to ip address.\n");
+    if (inet_ntop(family, in_addr, out_ip, len) == NULL) { 
         return 0;
     }
 
     return 1;
 }
 
-// Function that creates a configuration with some default values:
-int createConfig(struct addrinfo* config) {
-
-	// Check if config is null:
-	if ( config == NULL ) {
-		printf("Config is null.\n");
+int net_create_config(struct addrinfo* config) {
+	if (config == NULL) {
 		return 0;
 	}
 	
-	// https://beej.us/guide/bgnet/
-	// Set struct to empty:
 	memset(config, 0, sizeof(struct addrinfo));
-
-	// Setting values in the struct 
 	config->ai_family = AF_UNSPEC;
-	config->ai_protocol = 0;
 	config->ai_socktype = SOCK_STREAM;
-	config->ai_flags = (AI_V4MAPPED | AI_ADDRCONFIG); // from "getaddrinfo" man page; default setting
+	config->ai_flags = (AI_V4MAPPED | AI_ADDRCONFIG);
 	return 1;
 }
 
-// Function that gets address results from query:
-// ip: stores the ip or hostname
-// port: stores the port number in string format
-// config: stores the instructions for what kind of results to get
-// res: contains pointer to linked list of results
-int getAddresses(const char* ip, const char* port, const struct addrinfo* config, struct addrinfo **res) {
-
-    // Declaring status variable to store result of getaddrinfo
-    int status;
-
-    if ( (status = getaddrinfo(ip, port, config, res)) != 0 ) {
-        printf("Couldn't get results: %s\n", gai_strerror(status));
+int net_get_addresses(const char* ip, const char* port, const struct addrinfo* config, struct addrinfo **res) {
+    if (getaddrinfo(ip, port, config, res) != 0) {
         return 0;
     }
-
     return 1;
 }

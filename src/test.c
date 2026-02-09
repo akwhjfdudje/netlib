@@ -1,282 +1,130 @@
 #include "addr.h"
 #include "client.h"
 #include "server.h"
-#include "stdlib.h"
-#include <bits/posix2_lim.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <arpa/inet.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
+#include <assert.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 
+void test_address_conversion() {
+    printf("Testing address conversion... ");
+    struct in_addr addr;
+    char ip_buf[INET_ADDRSTRLEN];
 
-// https://stackoverflow.com/questions/3747086/reading-the-whole-text-file-into-a-char-array-in-c 
-char* load_file(char const* path, long* len) {
+    assert(net_addr_to_bin(0, "127.0.0.1", &addr) == 1);
+    assert(net_bin_to_addr(0, &addr, ip_buf, INET_ADDRSTRLEN) == 1);
+    assert(strcmp(ip_buf, "127.0.0.1") == 0);
 
-    char* buffer = 0;
-    long length;
-    FILE* f = fopen (path, "rb"); 
+    assert(net_addr_to_bin(0, "invalid", &addr) == 0);
+    printf("PASSED\n");
+}
 
-    if (f) {
-		fseek (f, 0, SEEK_END);
-		length = ftell (f);
-		printf("length of file: %ld\n", length);
-		fseek (f, 0, SEEK_SET);
-		buffer = (char*)malloc((length+1)*sizeof(char));
-		if (buffer) {
-			fread(buffer, sizeof(char), length, f);
-		}
-		fclose (f);
+void test_client_server_basic() {
+    printf("Testing basic client-server communication... ");
+    const char *port = "9001";
+    const char *msg = "Hello, netlib!";
+    
+    pid_t pid = fork();
+    if (pid == 0) {
+        int listen_fd = net_start_server(NULL, port);
+        assert(listen_fd != -1);
+        int client_fd;
+        assert(net_accept(listen_fd, &client_fd) == 1);
+        char buf[64] = {0};
+        assert(net_recv_all(client_fd, buf, strlen(msg)) != -1);
+        assert(strcmp(buf, msg) == 0);
+        close(client_fd);
+        close(listen_fd);
+        exit(0);
+    } else {
+        sleep(1);
+        int sock_fd = net_start_client("127.0.0.1", port);
+        assert(sock_fd != -1);
+        assert(net_send_all(sock_fd, msg, strlen(msg)) == 1);
+        close(sock_fd);
+        int status;
+        waitpid(pid, &status, 0);
+        assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
     }
-	printf("length of file: %ld\n", length);
-    buffer[length] = '\0';
-	printf("second last char: %c\n", buffer[length - 1247]);
-	*len = length;
-	return buffer;
+    printf("PASSED\n");
 }
 
-// Function to load random bytes into a buffer
-char* load_random(long len) {
+void test_large_data_transfer() {
+    printf("Testing large data transfer (1MB)... ");
+    const char *port = "9002";
+    size_t size = 1024 * 1024; // 1MB
+    char *data = malloc(size);
+    assert(data != NULL);
+    for (size_t i = 0; i < size; i++) data[i] = (char)(i % 256);
 
-	int openResult;
-	ssize_t readResult;
-
-	if ( (openResult = open("/dev/urandom", O_RDONLY)) < 0 ) {
-		perror("open");
-		printf("Couldn't open file.\n");
-		return NULL;
-	}
-
-	char* buffer = malloc(len * sizeof(char));
-	if ( (readResult = read(openResult, buffer, len)) < 0) {
-		perror("read");
-		printf("Couldn't read the file.\n");
-		return NULL;
-	}
-
-	// Replace all null characters in the buffer:
-	for ( int i = 0; i < len; i++ ) {
-		if ( buffer[i] == '\0' ) {
-			buffer[i] = 'a';
-		}
-	}
-
-	return buffer;		
+    pid_t pid = fork();
+    if (pid == 0) {
+        int listen_fd = net_start_server(NULL, port);
+        assert(listen_fd != -1);
+        int client_fd;
+        assert(net_accept(listen_fd, &client_fd) == 1);
+        char *recv_buf = malloc(size);
+        assert(net_recv_all(client_fd, recv_buf, size) != -1);
+        assert(memcmp(data, recv_buf, size) == 0);
+        free(recv_buf);
+        close(client_fd);
+        close(listen_fd);
+        exit(0);
+    } else {
+        sleep(1);
+        int sock_fd = net_start_client("127.0.0.1", port);
+        assert(sock_fd != -1);
+        assert(net_send_all(sock_fd, data, size) == 1);
+        close(sock_fd);
+        int status;
+        waitpid(pid, &status, 0);
+        assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+    }
+    free(data);
+    printf("PASSED\n");
 }
 
-// Testing code
-int main(int argc, char **argv) {
+void test_file_transfer() {
+    printf("Testing simulated file transfer... ");
+    const char *port = "9003";
+    const char *test_data = "Simulated file content with various characters: !@#$%^&*()_+";
+    size_t size = strlen(test_data);
 
-	// Test for checking IP conversion
-	if ( argc == 2 && strcmp(argv[1], "convert") == 0 ) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        int listen_fd = net_start_server(NULL, port);
+        assert(listen_fd != -1);
+        int client_fd;
+        assert(net_accept(listen_fd, &client_fd) == 1);
+        char *recv_buf = malloc(size + 1);
+        assert(net_recv_all(client_fd, recv_buf, size) != -1);
+        recv_buf[size] = '\0';
+        assert(strcmp(test_data, recv_buf) == 0);
+        free(recv_buf);
+        close(client_fd);
+        close(listen_fd);
+        exit(0);
+    } else {
+        sleep(1);
+        int sock_fd = net_start_client("127.0.0.1", port);
+        assert(sock_fd != -1);
+        assert(net_send_all(sock_fd, test_data, size) == 1);
+        close(sock_fd);
+        int status;
+        waitpid(pid, &status, 0);
+        assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+    }
+    printf("PASSED\n");
+}
 
-		// Declaring variables for first test:
-		// address: stores address string to test conversion
-		// v: stores ip version
-		// sockaddr: stores sockaddr_in struct
-		char* address = "127.0.0.1"; 
-		int v = 0;
-		struct sockaddr_in sockaddr;
-
-		// Test for getIPToInteger 
-		printf("'getIPToInteger' test result: %d\n", getIPToInteger(v, address, &(sockaddr.sin_addr)));
-		
-		// Declaring variables for second test:
-		// ip: will store ip from function
-		char ip[INET_ADDRSTRLEN];
-
-		// Test for getIntegerToIP
-		printf("'getIntegerToIP' test result: %d\n", getIntegerToIP(v, &(sockaddr.sin_addr), ip, INET_ADDRSTRLEN));
-		printf("ip from last test: %s\n", ip);
-		return 0;
-	}
-
-	// Declaring variables:
-	// sockfd: stores the file descriptor for the binding
-	// new_fd: stores the file descriptor for sending and receiving
-	// config: stores the configuration for the binding
-	int sockfd, new_fd;
-	struct addrinfo config;
-	char* address = "127.0.0.1"; 
-	
-	// Test to bind and listen on an address:
-	if ( argc == 2 && strcmp(argv[1], "serve") == 0 ) {
-	
-		char buf[100] = {};
-		int bytes;
-		FILE* f = fopen("./test.file", "w+");
-
-		// Starting server:
-		printf("Starting server:\n");
-		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
-			printf("Couldn't start server.\n");
-			return 1;
-		}
-		
-		// Receiving data:
-		printf("Receiving data from connection.\n");
-		if ( (bytes = receiveData(new_fd, buf, 100)) == -1 ) {
-			printf("Couldn't receive data from connection.\n");
-			return 1;
-		} else {
-			printf("Bytes received: %d\n", bytes);
-			printf("Received data: \n%s", buf);
-		}
-
-		// Writing to file:
-		fwrite(buf, sizeof(char), 100, f);
-
-		return 0;
-	}
-
-	// Test to connect to an address:
-	if ( argc == 2 && strcmp(argv[1], "connect") == 0 ) {
-
-		char* test_text = "client test\n";
-
-		// Create the config
-		if ( !createConfig(&config) ) {
-			printf("Couldn't create config.\n");
-			return 1;
-		}
-
-		// Connecting to server:
-		printf("Connecting to server:\n");
-		if ( !sendServer(address, "8080", &config, &sockfd, test_text, strlen(test_text)) ) {
-			printf("Couldn't connect to server.\n");
-			return 1;
-		}
-
-		return 0;
-	}
-	
-	// Test to send a large amount of data
-	if ( argc == 3 && strcmp(argv[1], "sendlarge") == 0 ) {
-		
-		// Declaring variables:
-		long length = atoi(argv[2]);	
-		char* buffer = load_random(length);
-		printf("length: %ld\n", length);
-
-		// Checking buffer:
-		if ( buffer == NULL ) {
-			printf("Couldn't load bytes.\n");
-			return 1;
-		}
-
-		// Creating config:
-		if ( !createConfig(&config) ) {
-			printf("Couldn't create config.\n");
-			return 1;
-		}
-
-		// Sending data:
-		if ( !sendServer(address, "8080", &config, &sockfd, buffer, length) ) {
-			printf("Couldn't send data.\n");
-			free(buffer);	
-			return 1;
-		}
-
-		// Exiting:
-		free(buffer);
-		return 0;
-	}
-
-	// Test to send a file
-	if ( argc == 2 && strcmp(argv[1], "sendfile") == 0 ) {
-
-		// Opening the file:
-		long len;
-		char* src = load_file("/etc/passwd", &len);
-
-		// Create the config
-		if ( !createConfig(&config) ) {
-			printf("Couldn't create config.\n");
-			return 1;
-		}
-
-		// Sending the file:
-		if ( !sendServer(address, "8080", &config, &sockfd, src, len) ) {
-			printf("Couldn't send file.\n");
-			free(src);
-			return 1;
-		}
-
-		// Free the buffer at the end:
-		free(src);
-		return 0;
-	}
-
-	// Test to receive a large amount of data
-	if ( argc == 3 && strcmp(argv[1], "receivelarge") == 0 ) {
-
-		FILE* f = fopen("./test.file", "w+");
-		long bytes;
-		long size = atoi(argv[2]); 
-		char* randomBuffer = malloc(size * sizeof(char));
-		printf("Size from args: %ld\n", size);
-		printf("Long: %lu\n", sizeof(long));
-		printf("Int: %lu\n", sizeof(int));
-		
-		// Starting server:
-		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
-			printf("Couldn't start server.\n");
-			free(randomBuffer);
-			return 1;
-		}
-		
-		// Receiving data:
-		if ( (bytes = receiveData(new_fd, randomBuffer, size)) == -1 ) {
-			printf("Couldn't receive data from connection.\n");
-			free(randomBuffer);
-			return 1;
-		} else {
-			printf("Bytes received: %ld\n", bytes);
-		}
-
-		// Writing to file:
-		fwrite(randomBuffer, sizeof(char), size, f);
-
-		free(randomBuffer);
-		return 0;
-	}
-
-	// Test to receive a file
-	if ( argc == 2 && strcmp(argv[1], "receive") == 0 ) {
-
-		// Checking stats of the /etc/passwd file to get the size 
-		struct stat st;
-		stat("/etc/passwd", &st);
-		FILE* f = fopen("./test.file", "w+");
-		long size = st.st_size;
-		int bytes;
-		char* passwdBuffer = malloc(size * sizeof(char));
-		printf("Size of passwd: %ld\n", size);
-		
-		// Starting server:
-		if ( (new_fd = startServer(&config, address, "9001")) == -1 ) {
-			printf("Couldn't start server.\n");
-			free(passwdBuffer);
-			return 1;
-		}
-		
-		// Receiving data:
-		if ( (bytes = receiveData(new_fd, passwdBuffer, size)) == -1 ) {
-			printf("Couldn't receive data from connection.\n");
-			free(passwdBuffer);
-			return 1;
-		} else {
-			printf("Received bytes: %d\n", bytes);
-		}
-
-		// Writing to file:
-		fwrite(passwdBuffer, sizeof(char), size, f);
-
-		free(passwdBuffer);
-		return 0;
-	}
+int main() {
+    test_address_conversion();
+    test_client_server_basic();
+    test_large_data_transfer();
+    test_file_transfer();
+    printf("All tests passed!\n");
     return 0;
 }

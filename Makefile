@@ -1,47 +1,28 @@
-# Flags:
-MAKEFLAGS += --silent
+CC = gcc
+CFLAGS = -Wall -Wextra -Iinclude -fPIC
+LDFLAGS = -L. -lnet
 
-# Builds:
-build: bin bin/addr.o bin/server.o bin/client.o lib target
-	mv bin/libnetlib.a target/
-	rm -f bin/*
-	rm -rf bin/
+SRC_DIR = src
+INC_DIR = include
+OBJ_DIR = obj
+LIB = libnet.a
 
-test: bin bin/addr.o bin/server.o bin/test.o bin/client.o libtest
-	gcc -Werror -Wall -L./bin -lnetlib -o bin/ncc_test 
-	tests/main.sh
+SRCS = $(SRC_DIR)/addr.c $(SRC_DIR)/client.c $(SRC_DIR)/server.c
+OBJS = $(OBJ_DIR)/addr.o $(OBJ_DIR)/client.o $(OBJ_DIR)/server.o
 
-lib:
-	ar rcs bin/libnetlib.a bin/addr.o bin/server.o bin/client.o
+all: $(LIB) test
 
-libtest:
-	ar rcs bin/libnetlib.a bin/test.o bin/addr.o bin/server.o bin/client.o
+$(LIB): $(OBJS)
+	ar rcs $@ $^
 
-# Cleaning:
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+test: $(SRC_DIR)/test.c $(LIB)
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+
 clean:
-	rm -f bin/*
-	rm -rf bin/
-	rm -rf target/
-	rm -f test.file test.log random.data 
+	rm -rf $(OBJ_DIR) $(LIB) test test.file
 
-# Dependencies:
-bin/addr.o: src/addr.c
-	gcc -Werror -Wall -ggdb src/addr.c -c -o bin/addr.o
-
-bin/main.o: src/main.c
-	gcc -Werror -Wall -ggdb src/main.c -c -o bin/main.o
-
-bin/server.o: src/server.c
-	gcc -Werror -Wall -ggdb src/server.c -c -o bin/server.o
-
-bin/client.o: src/client.c
-	gcc -Werror -Wall -ggdb src/client.c -c -o bin/client.o
-
-bin/test.o:
-	gcc -Werror -Wall -ggdb src/test.c -c -o bin/test.o
-
-bin:
-	mkdir bin/
-
-target:
-	mkdir target/
+.PHONY: all clean
