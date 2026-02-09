@@ -164,7 +164,6 @@ int main() {
     test_client_server_basic();
     test_messaging_protocol();
     test_udp_basic();
-    sleep(1);
     test_timeout();
     printf("All tests passed!\n");
     return 0;
