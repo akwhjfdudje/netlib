@@ -7,8 +7,8 @@ INC_DIR = include
 OBJ_DIR = obj
 LIB = libnet.a
 
-SRCS = $(SRC_DIR)/addr.c $(SRC_DIR)/client.c $(SRC_DIR)/server.c
-OBJS = $(OBJ_DIR)/addr.o $(OBJ_DIR)/client.o $(OBJ_DIR)/server.o
+SRCS = $(SRC_DIR)/addr.c $(SRC_DIR)/client.c $(SRC_DIR)/server.c $(SRC_DIR)/udp.c
+OBJS = $(OBJ_DIR)/addr.o $(OBJ_DIR)/client.o $(OBJ_DIR)/server.o $(OBJ_DIR)/udp.o
 
 all: $(LIB) test
 

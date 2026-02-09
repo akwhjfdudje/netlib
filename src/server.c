@@ -6,6 +6,20 @@
 #include <unistd.h>
 #include <string.h>
 
+int net_set_timeout(int sockfd, int seconds) {
+    struct timeval timeout;
+    timeout.tv_sec = seconds;
+    timeout.tv_usec = 0;
+
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        return 0;
+    }
+    if (setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
+        return 0;
+    }
+    return 1;
+}
+
 int net_bind(const char* ip, const char* port, const struct addrinfo* config, int *out_sockfd) {
     struct addrinfo *res, *r;
     int sockfd;
@@ -36,6 +50,7 @@ int net_bind(const char* ip, const char* port, const struct addrinfo* config, in
     freeaddrinfo(res);
 
     if (r == NULL) {
+        perror("net_bind");
         return 0;
     }
 

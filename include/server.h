@@ -4,6 +4,16 @@
 #include "addr.h"
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+
+/**
+ * @brief Sets send and receive timeouts for a socket.
+ * 
+ * @param sockfd Socket file descriptor.
+ * @param seconds Timeout in seconds.
+ * @return 1 on success, 0 on failure.
+ */
+int net_set_timeout(int sockfd, int seconds);
 
 /**
  * @brief Binds a socket to a specific IP and port.
