@@ -61,3 +61,11 @@ int net_udp_recvfrom(int sockfd, char *buf, size_t len) {
     ssize_t bytes = recvfrom(sockfd, buf, len, 0, (struct sockaddr *)&addr, &addrlen);
     return (int)bytes;
 }
+
+int net_udp_enable_broadcast(int sockfd) {
+    int optval = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)) < 0) {
+        return 0;
+    }
+    return 1;
+}

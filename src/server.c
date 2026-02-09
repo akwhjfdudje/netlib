@@ -1,6 +1,8 @@
 #include "server.h"
 #include "addr.h"
+#include "log.h"
 #include <netdb.h>
+#include <netinet/tcp.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -26,6 +28,7 @@ int net_bind(const char* ip, const char* port, const struct addrinfo* config, in
     int yes = 1;
 
     if (!net_get_addresses(ip, port, config, &res)) {
+        NET_LOG_E("Failed to get addresses for bind: %s:%s", ip ? ip : "ANY", port);
         return 0;
     }
 
@@ -50,7 +53,7 @@ int net_bind(const char* ip, const char* port, const struct addrinfo* config, in
     freeaddrinfo(res);
 
     if (r == NULL) {
-        perror("net_bind");
+        NET_LOG_E("Could not bind to any address on port %s", port);
         return 0;
     }
 
@@ -95,6 +98,7 @@ int net_start_server(const char *ip, const char *port) {
     int sockfd;
 
     if (!net_create_config(&config)) {
+        NET_LOG_E("Failed to create server config.");
         return -1;
     }
     config.ai_flags |= AI_PASSIVE;
@@ -108,5 +112,6 @@ int net_start_server(const char *ip, const char *port) {
         return -1;
     }
 
+    NET_LOG_I("Server started on port %s", port);
     return sockfd;
 }

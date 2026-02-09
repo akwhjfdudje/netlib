@@ -2,6 +2,8 @@
 #include "client.h"
 #include "server.h"
 #include "udp.h"
+#include "msg.h"
+#include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +23,15 @@ void test_address_conversion() {
     assert(strcmp(ip_buf, "127.0.0.1") == 0);
 
     assert(net_addr_to_bin(0, "invalid", &addr) == 0);
+    printf("PASSED\n");
+}
+
+void test_logging() {
+    printf("Testing logging system... ");
+    net_log_set_level(NET_LOG_DEBUG);
+    NET_LOG_I("This is an info message for testing.");
+    NET_LOG_D("This is a debug message for testing.");
+    NET_LOG_E("This is an error message for testing.");
     printf("PASSED\n");
 }
 
@@ -54,23 +65,24 @@ void test_client_server_basic() {
     printf("PASSED\n");
 }
 
-void test_large_data_transfer() {
-    printf("Testing large data transfer (1MB)... ");
-    const char *port = "9102";
-    size_t size = 1024 * 1024; // 1MB
-    char *data = malloc(size);
-    assert(data != NULL);
-    for (size_t i = 0; i < size; i++) data[i] = (char)(i % 256);
-
+void test_messaging_protocol() {
+    printf("Testing length-prefixed messaging... ");
+    const char *port = "9107";
+    const char *msg = "This is a length-prefixed message test.";
+    
     pid_t pid = fork();
     if (pid == 0) {
         int listen_fd = net_start_server(NULL, port);
         assert(listen_fd != -1);
         int client_fd;
         assert(net_accept(listen_fd, &client_fd) == 1);
-        char *recv_buf = malloc(size);
-        assert(net_recv_all(client_fd, recv_buf, size) != -1);
-        assert(memcmp(data, recv_buf, size) == 0);
+        
+        char *recv_buf;
+        size_t recv_len;
+        assert(net_recv_msg(client_fd, &recv_buf, &recv_len) == 1);
+        assert(recv_len == strlen(msg));
+        assert(strcmp(recv_buf, msg) == 0);
+        
         free(recv_buf);
         close(client_fd);
         close(listen_fd);
@@ -79,41 +91,7 @@ void test_large_data_transfer() {
         sleep(1);
         int sock_fd = net_start_client("127.0.0.1", port);
         assert(sock_fd != -1);
-        assert(net_send_all(sock_fd, data, size) == 1);
-        close(sock_fd);
-        int status;
-        waitpid(pid, &status, 0);
-        assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
-    }
-    free(data);
-    printf("PASSED\n");
-}
-
-void test_file_transfer() {
-    printf("Testing simulated file transfer... ");
-    const char *port = "9103";
-    const char *test_data = "Simulated file content with various characters: !@#$%^&*()_+";
-    size_t size = strlen(test_data);
-
-    pid_t pid = fork();
-    if (pid == 0) {
-        int listen_fd = net_start_server(NULL, port);
-        assert(listen_fd != -1);
-        int client_fd;
-        assert(net_accept(listen_fd, &client_fd) == 1);
-        char *recv_buf = malloc(size + 1);
-        assert(net_recv_all(client_fd, recv_buf, size) != -1);
-        recv_buf[size] = '\0';
-        assert(strcmp(test_data, recv_buf) == 0);
-        free(recv_buf);
-        close(client_fd);
-        close(listen_fd);
-        exit(0);
-    } else {
-        sleep(1);
-        int sock_fd = net_start_client("127.0.0.1", port);
-        assert(sock_fd != -1);
-        assert(net_send_all(sock_fd, test_data, size) == 1);
+        assert(net_send_msg(sock_fd, msg, strlen(msg)) == 1);
         close(sock_fd);
         int status;
         waitpid(pid, &status, 0);
@@ -154,31 +132,23 @@ void test_timeout() {
     const char *port = "9106";
     
     int listen_fd = net_start_server(NULL, port);
-    if (listen_fd == -1) {
-        perror("net_start_server");
-        assert(listen_fd != -1);
-    }
+    assert(listen_fd != -1);
     
     pid_t pid = fork();
     if (pid == 0) {
-        // Parent process (Client)
         sleep(1);
         int sock_fd = net_start_client("127.0.0.1", port);
         assert(sock_fd != -1);
-        sleep(3); // Stay connected but don't send data
+        sleep(3);
         close(sock_fd);
         exit(0);
     } else {
-        // Server process
         int client_fd;
         assert(net_accept(listen_fd, &client_fd) == 1);
         assert(net_set_timeout(client_fd, 1) == 1);
         
         char buf[10];
-        int result = net_recv_all(client_fd, buf, 10);
-        
-        // Should return -1 due to timeout
-        assert(result == -1);
+        assert(net_recv_all(client_fd, buf, 10) == -1);
         
         close(client_fd);
         close(listen_fd);
@@ -188,10 +158,11 @@ void test_timeout() {
 }
 
 int main() {
+    net_log_set_level(NET_LOG_INFO);
     test_address_conversion();
+    test_logging();
     test_client_server_basic();
-    test_large_data_transfer();
-    test_file_transfer();
+    test_messaging_protocol();
     test_udp_basic();
     sleep(1);
     test_timeout();

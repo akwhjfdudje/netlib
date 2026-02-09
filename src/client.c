@@ -1,10 +1,12 @@
 #include "client.h"
 #include "addr.h"
+#include "log.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <netinet/tcp.h>
 
 int net_connect(const char* ip, const char* port, const struct addrinfo* config, int *out_sockfd) {
     struct addrinfo *res, *r;
@@ -49,17 +51,36 @@ int net_send_all(int sockfd, const char* msg, size_t len) {
     return 1;
 }
 
+int net_set_keepalive(int sockfd) {
+    int optval = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)) < 0) {
+        return 0;
+    }
+    return 1;
+}
+
 int net_start_client(const char *ip, const char *port) {
     struct addrinfo config;
     int sockfd;
 
     if (!net_create_config(&config)) {
+        NET_LOG_E("Failed to create client config.");
         return -1;
     }
 
-    if (!net_connect(ip, port, &config, &sockfd)) {
-        return -1;
+    int retries = 3;
+    while (retries > 0) {
+        if (net_connect(ip, port, &config, &sockfd)) {
+            NET_LOG_I("Connected to %s:%s", ip, port);
+            return sockfd;
+        }
+        retries--;
+        if (retries > 0) {
+            NET_LOG_W("Connection failed, retrying in 1s... (%d retries left)", retries);
+            sleep(1);
+        }
     }
 
-    return sockfd;
+    NET_LOG_E("Failed to connect to %s:%s after retries.", ip, port);
+    return -1;
 }

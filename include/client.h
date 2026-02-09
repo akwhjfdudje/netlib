@@ -6,6 +6,14 @@
 #include <sys/socket.h>
 
 /**
+ * @brief Enables TCP Keep-Alive on a socket.
+ * 
+ * @param sockfd Socket file descriptor.
+ * @return 1 on success, 0 on failure.
+ */
+int net_set_keepalive(int sockfd);
+
+/**
  * @brief Connects a socket to a remote IP and port.
  * 
  * @param ip Remote IP address or hostname.

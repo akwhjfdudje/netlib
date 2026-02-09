@@ -36,4 +36,12 @@ int net_udp_sendto(int sockfd, const char *ip, const char *port, const char *msg
  */
 int net_udp_recvfrom(int sockfd, char *buf, size_t len);
 
+/**
+ * @brief Enables broadcasting on a UDP socket.
+ * 
+ * @param sockfd UDP socket file descriptor.
+ * @return 1 on success, 0 on failure.
+ */
+int net_udp_enable_broadcast(int sockfd);
+
 #endif
