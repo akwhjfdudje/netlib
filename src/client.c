@@ -1,4 +1,5 @@
 #include "client.h"
+#include "server.h"
 #include "addr.h"
 #include "log.h"
 #include <stdlib.h>
@@ -83,4 +84,16 @@ int net_start_client(const char *ip, const char *port) {
 
     NET_LOG_E("Failed to connect to %s:%s after retries.", ip, port);
     return -1;
+}
+
+int net_start_client_timeout(const char *ip, const char *port, int timeout_seconds) {
+    int sockfd = net_start_client(ip, port);
+    if (sockfd == -1) return -1;
+
+    if (!net_set_timeout(sockfd, timeout_seconds)) {
+        close(sockfd);
+        return -1;
+    }
+
+    return sockfd;
 }

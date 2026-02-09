@@ -1,6 +1,6 @@
 # netlib
 
-A simple, robust C networking library for TCP and UDP communication.
+A simple C networking library for TCP and UDP communication.
 
 ## Quick Start
 
@@ -13,15 +13,33 @@ make
 
 ## Features
 
-- **Robust TCP**: Guaranteed data transfer and automatic framing.
-- **Easy UDP**: Simple messaging and broadcast support.
-- **Reliable**: Connection retries and socket timeouts.
-- **Developer Friendly**: Structured logging and clean API.
+- **TCP**: Guaranteed data transfer and automatic framing.
+- **UDP**: Simple messaging and broadcast support.
+- **Logging**: Structured logging and clean API.
 
 ## Documentation
 
 - [**API Reference**](DOCUMENTATION.md): Detailed function descriptions.
 - [**Usage Guide**](USAGE.md): Practical code examples.
+
+## Quick Example (TCP)
+
+```c
+#include "netlib.h"
+
+int main() {
+    // Start a server on port 8080
+    int server_fd = net_start_server(NULL, "8080");
+    
+    // In another process: Connect to it
+    int client_fd = net_start_client("127.0.0.1", "8080");
+    
+    // Send a length-prefixed string
+    net_send_str(client_fd, "Hello netlib!");
+    
+    return 0;
+}
+```
 
 ## Integration
 

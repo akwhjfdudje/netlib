@@ -63,4 +63,15 @@ int net_recv_all(int sockfd, char *buf, size_t len);
  */
 int net_start_server(const char *ip, const char *port);
 
+/**
+ * @brief Starts a server with extended configuration.
+ * 
+ * @param ip IP address string.
+ * @param port Port number string.
+ * @param backlog Listen backlog.
+ * @param timeout_seconds Timeout in seconds for send/recv.
+ * @return Listening socket file descriptor on success, -1 on failure.
+ */
+int net_start_server_ext(const char *ip, const char *port, int backlog, int timeout_seconds);
+
 #endif

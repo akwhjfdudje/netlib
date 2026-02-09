@@ -43,4 +43,14 @@ int net_send_all(int sockfd, const char* msg, size_t len);
  */
 int net_start_client(const char *ip, const char *port);
 
+/**
+ * @brief Starts a client and sets a timeout.
+ * 
+ * @param ip Remote IP or hostname.
+ * @param port Remote port.
+ * @param timeout_seconds Timeout in seconds for send/recv.
+ * @return Connected socket file descriptor on success, -1 on failure.
+ */
+int net_start_client_timeout(const char *ip, const char *port, int timeout_seconds);
+
 #endif

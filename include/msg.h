@@ -2,6 +2,7 @@
 #define NETLIB_MSG_H
 
 #include <stddef.h>
+#include <string.h>
 
 /**
  * @brief Sends a length-prefixed message over a TCP socket.
@@ -22,5 +23,10 @@ int net_send_msg(int sockfd, const char *msg, size_t len);
  * @return 1 on success, 0 on failure.
  */
 int net_recv_msg(int sockfd, char **out_buf, size_t *out_len);
+
+/**
+ * @brief Helper to send a string as a length-prefixed message.
+ */
+#define net_send_str(sockfd, str) net_send_msg(sockfd, str, strlen(str))
 
 #endif

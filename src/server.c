@@ -115,3 +115,24 @@ int net_start_server(const char *ip, const char *port) {
     NET_LOG_I("Server started on port %s", port);
     return sockfd;
 }
+
+int net_start_server_ext(const char *ip, const char *port, int backlog, int timeout_seconds) {
+    int sockfd = net_start_server(ip, port);
+    if (sockfd == -1) return -1;
+
+    if (backlog > 0) {
+        if (!net_listen(sockfd, backlog)) {
+            close(sockfd);
+            return -1;
+        }
+    }
+
+    if (timeout_seconds > 0) {
+        if (!net_set_timeout(sockfd, timeout_seconds)) {
+            close(sockfd);
+            return -1;
+        }
+    }
+
+    return sockfd;
+}
